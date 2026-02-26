@@ -2,21 +2,20 @@ import groovy.json.JsonSlurper
 
 def call() {
     try {
-        def cmd = ['/bin/bash', '-c', '/usr/bin/az account list --query "[].{name:name, id:id}" --output json']
-        def process = cmd.execute()
+        // Use full path to az (usually /usr/bin/az or /usr/local/bin/az)
+        def process = ['/usr/bin/az', 'account', 'list', '--query', '[].{name:name, id:id}', '--output', 'json'].execute()
         def output = process.text
+        def error = process.err.text
         process.waitFor()
 
         if (process.exitValue() == 0 && output) {
-            def jsonSlurper = new groovy.json.JsonSlurper()
-            def data = jsonSlurper.parseText(output)
-            
-            // Return the list for the dropdown
-            return data.collect { sub -> "${sub.name} (${sub.id})" }
+            def data = new JsonSlurper().parseText(output)
+            return data.collect { "${it.name} (${it.id})" }
         } else {
-            return ["No subscriptions found or CLI not logged in"]
+            // This will show up in your dropdown so you can see the actual error
+            return ["Error: ${error.take(100)}"]
         }
     } catch (Exception e) {
-        return ["Error in Shared Library: ${e.message}"]
+        return ["Library Exception: ${e.message}"]
     }
 }
