@@ -16,7 +16,7 @@ def call(Map config =[:]){
 
               
                 # We use quotes around the path in case of spaces
-                git add "${filePath}"
+                git add -f "${filePath}"
 
                 # 2. Check if the index is now "dirty" (has changes)
                 if [ -n "\$(git status --porcelain)" ]; then
