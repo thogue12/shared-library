@@ -14,14 +14,17 @@ def call(Map config =[:]){
                 git config user.email "thogue12@local.com"
                 git config user.name  "thogue12"
 
-                # Use -uall to ensure git sees UNTRACKED files (newly created ones)
-                if [ -n "\$(git status --porcelain -uall ${filePath})" ]; then
+              
+                # We use quotes around the path in case of spaces
+                git add "${filePath}"
+
+                # 2. Check if the index is now "dirty" (has changes)
+                if [ -n "\$(git status --porcelain)" ]; then
                     echo "Changes detected in ${filePath}. Committing..."
-                    git add ${filePath}
-                    git commit -m "Automated update of ${filePath} from Jenkins build ${env.BUILD_NUMBER}"
+                    git commit -m "Automated update of ${filePath} - Build #${env.BUILD_NUMBER}"
                     git push https://\${GIT_USER}:\${GIT_PASS}@${repoUrl} HEAD:${branch}
                 else
-                    echo "No changes detected on ${filePath}. Skipping git push"
+                    echo "No changes detected on ${filePath}. Skipping git push."
                 fi
             """
         }
