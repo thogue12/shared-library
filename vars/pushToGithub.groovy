@@ -11,7 +11,7 @@ def call(Map config =[:]){
         withCredentials([usernamePassword(credentialsId: credentialsId, usernameVariable: 'GIT_USER', passwordVariable: 'GIT_PASS')]) {
         
             sh """
-                git config user.email "thogue12@local.com"
+                git config user.email "thogue12@gmail.com"
                 git config user.name  "thogue12"
 
               
@@ -19,7 +19,7 @@ def call(Map config =[:]){
                 git add -f "${filePath}"
 
                 # 2. Check if the index is now "dirty" (has changes)
-                if [ -n "\$(git status --porcelain)" ]; then
+                if [ -n "\$(git status --porcelain --cached)" ]; then
                     echo "Changes detected in ${filePath}. Committing..."
                     git commit -m "Automated update of ${filePath} - Build #${env.BUILD_NUMBER}"
                     git push https://\${GIT_USER}:\${GIT_PASS}@${repoUrl} HEAD:${branch}
