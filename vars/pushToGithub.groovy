@@ -18,8 +18,8 @@ def call(Map config =[:]){
                 # We use quotes around the path in case of spaces
                 git add -f "${filePath}"
 
-                # 2. Check if the index is now "dirty" (has changes)
-                if [ -n "\$(git status --porcelain --cached)" ]; then
+                # 2. Check if the index has changes
+                if ! git diff --cached --quiet; then
                     echo "Changes detected in ${filePath}. Committing..."
                     git commit -m "Automated update of ${filePath} - Build #${env.BUILD_NUMBER}"
                     git push https://\${GIT_USER}:\${GIT_PASS}@${repoUrl} HEAD:${branch}
